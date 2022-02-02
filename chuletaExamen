@@ -1,0 +1,902 @@
+                                            PRACTICAS PARADIGMAS DE LA PROGRAMACION 2021
+                                            
+PRACTICA 2 .
+
+1. Escriba en OCaml un programa ejecutable pi que calcule una buena aproximaci ́on del
+n ́umero pi y muestre el resultado por la salida est ́andar seguido de un salto de l ́ınea.
+
+print_endline(Printf.sprintf"%.11f" (2.0 *. asin 1.0));;
+
+2.Escriba en OCaml un programa ejecutable e que calcule una buena aproximacion del
+numero e y muestre el resultado por la salida estandar seguido de un salto de linea
+
+print_endline(Printf.sprintf"%.11f" (exp 1.));;
+
+3.Utilizando esta funci ́on construya un programa ejecutable fact que muestre por la salida
+est ́andar (seguido de un salto de l ́ınea) el valor del factorial del n ́umero que se pase
+como argumento al invocar el programa
+
+let rec fact = function x -> if x = 0 then 1 else x * fact (x-1);;
+let argc = Array.length Sys.argv;;
+let x = if argc == 2 then int_of_string Sys.argv.(1) else 0;;
+if x == 0 then print_endline("fact: número de argumentos inválido") else  print_endline(Printf.sprintf"%d" (fact x));;
+
+
+PRACTICA 3.
+
+1.
+una expresIon de la forma if <b> then <e1> else <e2>
+es siempre equivalente a
+(function true -> <e1> | false -> <e2>) <b>
+Utilizando esta relacion, reescriba (y simplifique cuando sea posible) el siguiente fragmento
+de codigo OCaml sin utilizar frases if-then-else:
+
+let abs n = if n >= 0 then n else - n;;
+let par n = if n mod 2 = 0 then true else false;;
+let saluda s = if s = "Hola" then print_endline "Hola!" else ();;
+let f n = if n mod 2 = 0 then "es par" else "es impar";;
+let f n = if n mod 2 = 0 then "m ́ultiplo de 2"
+else if n mod 3 = 0 then "m ́ultiplo de 3"
+else "impar";;
+SOLUCION:
+let abs n = (function true -> n | false -> -n)(n>=0);;
+let par n = (function true -> true | false -> false )(n mod 2=0);;
+let saluda s= (function true -> print_endline "Hola!" | false -> ())(s = "Hola");;
+let f n= (function true -> print_endline "Es par" | false -> print_endline "Es impar")(n mod 2 =0);;
+let f n= (function true -> "multiplo de 2" |false -> ((function true -> "multiplo de 3" | false -> "impar")(n mod 3 = 0)))(n mod 2 =0);;
+
+2.
+Te dan la funcion de fibonacci y te piden que hagas un programa que la imprima
+let rec fib n =
+if n <= 1 then n
+else fib (n-1) + fib (n-2);;
+
+let rec print x =
+if x =0 then (print_int(fib(x)); print_endline "")
+else (print(x-1); print_int(fib (x)) ; print_endline "");;
+
+3.
+te dan lafuncion IS PRIME  y te piden crear NEXT PRIME Y LAST PRIME 
+let is_prime n =
+let rec check_from i =
+i >= n ||
+(n mod i <> 0 && check_from (i+1))
+in check_from 2;;
+
+let rec next_prime n =
+ if is_prime (n+1)  == true then n+1
+ else next_prime (n+1);;
+ 
+let rec last_prime_to n =
+ if is_prime(n-1) == true then n-1
+ else last_prime_to(n-1);;
+ 
+PRACTICA 4.
+1. 
+Crear funcion que haga potencia.
+let rec power x y = if y=0 then 1 else if y=1 then x else x*( power x (y-1));;
+let rec power' x y = if y=0 then 1 else if y=1 then x else if y mod 2 = 0 then (power' (x*x) (y/2)) else x*(power' (x*x) (y/2));;
+let rec powerf x y = if y=0 then 1. else if x=0. then 0. else if (y mod 2 = 0) then powerf (x *. x) (y/2) else x*.powerf (x*. x) ((y-1)/2) ;;
+
+(* Powerf es más rápido porque en el primer algoritmo realiza una operación de más y porque hace menos llamadas recursivas*)
+2.
+crear funcion que haga mcd
+let rec mcd (x,y) = if y > 0 then mcd (y,(x mod y)) else x;;
+
+PRACTICA 5.
+let f n = if n mod 2 = 0 then n / 2 else 3 * n + 1;;
+let rec orbit n =
+  if n <=1 then print_endline("1")
+  else (
+  print_int(n);
+  Printf.printf(",");
+  orbit(f n));;
+  
+let rec length n =
+  if n <=1 then 1
+  else  1+length(f n);;
+  
+let rec top n =
+ if n <= 2 then n
+ else max n(top(f n));;
+ 
+let rec length'n'top n=
+  if n <= 1 then 1,n
+  else length n,top n;;
+  
+PRACTICA 6.
+let hd (h::_) = h;;
+
+let tl (_::t) = t;;
+
+let rec length = function
+ [] -> 0 
+ | _::t -> 1 + length t;;
+
+let rec compare_lengths = function 
+[] -> (function [] -> 0 | _ -> -1) 
+| _::t1 -> (function [] -> 1 | h2::t2 -> compare_lengths t1 t2);;
+
+
+let rec nth l x =  match l with 
+[] ->  raise (Failure "corto")
+| h::t -> if x=0 then h else nth t (x-1);;
+
+let rec append l1 l2= match l1 with 
+[] -> l2
+| h::t ->  h::append t l2;;
+
+let rec find p = function
+  [] -> raise Not_found
+| h::t -> if p h then h else find p t;;
+
+let rec for_all f = function 
+[]-> true 
+| h::t -> f h && for_all f t;;
+
+let rec exists x = function
+ [] -> false 
+| h::t -> if x h then true else exists x t;; 
+
+let rec mem x = function
+ [] -> false 
+ | h::t -> x = h || mem x t;;
+
+let rec filter x = function
+ [] -> []
+| h::t-> if x h then h::filter x t else filter x t ;;
+
+let  find_all = filter;;
+
+(*let rec partition x = function
+ [] -> []
+| h::t-> if x h then h::partition x t else t::partition x t ;;*)
+
+let partition f l = (filter f l), (filter (function 
+x->not(f x))l);;
+
+let rec split  = function
+ []->[],[]
+ | (a,b)::t-> let t1,t2 = split t in a::t1,b::t2;;
+
+let rec combine l1 l2 =
+ match (l1,l2) with
+  [], [] -> []
+  | h1::t1, h2::t2 -> (h1,h2) :: (combine (t1) (t2))
+  | _ -> raise (Invalid_argument "combine");;
+
+
+let init n f =
+  let rec init' i n f =
+    if i >= n then []
+    else (f i) :: (init' (i+1) n f)
+  in init' 0 n f;;
+  
+let rec rev  = function 
+[] -> []
+| h::t -> append(rev t) [h];;
+
+let rec rev_append l1 l2 = match l1 with 
+[] -> l2 
+| h::t -> rev_append t (h::l2);;
+ 
+let rec concat   = function
+ []-> []
+| h::t -> h@concat t;;
+
+let flatten = concat;; 
+
+let rec map x = function 
+[] -> []
+| h::t ->  x h::map x t;;
+
+let  rev_map x =  
+let rec rev_map_aux x acc = function
+[] -> acc
+| h::t ->  rev_map_aux x (x h::acc) t in rev_map_aux x [];;
+
+let rec map2 f l1 l2 = match (l1,l2) with
+| [],[] -> []
+| h1::t1,h2::t2 -> (f h1 h2)::(map2 f t1 t2)
+| _ -> raise (Invalid_argument "List.map2");;
+
+let rec fold_left op e = function  
+[] -> e 
+| h::t -> fold_left op (op e h) t;;
+
+let rec fold_right op l e = match l with 
+[]-> e 
+| h::t -> op h (fold_right op t e);;
+
+PRACTICA 7.
+
+let hd = function 
+[]-> raise (Failure "Lista vacía")
+|h::_ -> h;;
+
+let rec tl = function
+[] -> raise (Failure "Lista vacía")
+|_::t -> t;;
+
+let length l =
+  let rec aux l acum = match l with
+    [] -> acum
+    | h::t -> aux t (acum + 1)
+  in aux l 0;;
+
+let rec compare_lengths = function 
+[] -> (function [] -> 0 | _ -> -1) 
+| _::t1 -> (function [] -> 1 | h2::t2 -> compare_lengths t1 t2);;
+
+
+let rec nth l n = 
+if(n == 0) then hd l 
+else if(n > 0) then nth (tl l)(n-1)
+else if(n < 0) then raise (Invalid_argument "List.nth")
+else raise (Failure "nth");;
+
+let rec append l1 l2= match l1 with 
+[] -> l2
+| h::t ->  h::append t l2;;
+
+let rec find p = function
+  [] -> raise Not_found
+| h::t -> if p h then h else find p t;;
+
+let rec for_all f = function 
+[]-> true 
+| h::t -> f h && for_all f t;;
+
+let rec exists x = function
+ [] -> false 
+| h::t -> if x h then true else exists x t;; 
+
+let rec mem x = function
+ [] -> false 
+ | h::t -> x = h || mem x t;;
+
+let rev l =
+  let rec aux v = function
+    [] -> v
+    | h::t -> aux (h::v) t
+  in aux [] l;;
+  
+let rec filter f l =
+  let rec aux f l auxl = match l with
+    [] -> auxl
+    | h::t -> if f h
+      then aux f t (h::auxl)
+      else aux f t auxl
+    in aux f (rev l) [];;
+
+let  find_all = filter;;
+
+
+let partition f l = (filter f l), (filter (function 
+x->not(f x))l);;
+
+let rec split  = function
+ []->[],[]
+ | (a,b)::t-> let t1,t2 = split t in a::t1,b::t2;;
+
+let rec combine l1 l2 =
+ match (l1,l2) with
+  [], [] -> []
+  | h1::t1, h2::t2 -> (h1,h2) :: (combine (t1) (t2))
+  | _ -> raise (Invalid_argument "combine");;
+
+let init n f =
+  if n < 0
+    then raise (Invalid_argument"len < 0")
+    else let rec aux (i, l) =
+      if i = n then l else aux(i + 1, f i::l)
+    in rev(aux(0, []));;
+  
+let rec rev_append l1 l2 = match l1 with 
+[] -> l2 
+| h::t -> rev_append t (h::l2);;
+ 
+let rec concat   = function
+ []-> []
+| h::t -> h@concat t;;
+
+let flatten = concat;; 
+
+let rec map x = function 
+[] -> []
+| h::t ->  x h::map x t;;
+
+
+let rev_map f l =
+  let rec aux l auxl = match l with
+    [] -> auxl
+    | h::t -> aux t (f(h)::auxl)
+  in aux l [];;
+
+let rec map2 f l1 l2 = match (l1,l2) with
+| [],[] -> []
+| h1::t1,h2::t2 -> (f h1 h2)::(map2 f t1 t2)
+| _ -> raise (Invalid_argument "List.map2");;
+
+let rec fold_left op e = function  
+[] -> e 
+| h::t -> fold_left op (op e h) t;;
+
+let rec fold_right op l e = match l with 
+[]-> e 
+| h::t -> op h (fold_right op t e);;
+
+PRACTICA 8.
+
+1.
+(* curry : (('a * 'b) -> 'c) -> ('a -> ('b -> 'c)) *)
+let curry =  function f -> function a -> function b -> f (a,b);;
+let curry f a b = f (a,b);;
+
+(* uncurry : (('a -> ('b -> 'c) -> ('a * 'b) -> 'c)) *)
+let uncurry =  function f -> function (a,b) -> f a b;;
+let uncurry f(a,b) = f a b;;
+
+uncurry (+);;
+(* - : int * int -> int = <fun> *)
+
+let sum = (uncurry (+));;
+(* val sum : int * int -> int = <fun> *)
+
+(* sum 1;; 
+Error: expresión de tipo int pero se esperaba de tipo (int * int) *)
+
+sum (2, 1);;
+(* - : int = 3 *)
+
+let g = curry (function p -> 2 * fst p + 3 * snd p);;
+(* val g : int -> int -> int = <fun> *)
+
+(* g (2, 5);; 
+Error: expresión de tipo ('a * 'b) pero se esperaba de tipo int *)
+
+let h = g 2;;
+(* val h : int -> int = <fun> *)
+
+h 1, h 2, h 3;;
+(* - : int * int * int = (7, 10, 13) *)
+
+2.
+let comp f g x = f (g x);;
+
+let f = let square x = x * x in comp square ((+) 1);;
+
+3-
+let f x = x;;
+(* No se pueden escribir más funciones de este tipo*) 
+let h (x,y) = x ;;
+(* No se pueden escribir más funciones de este tipo*) 
+let i (x,y) = y;;
+(* No se pueden escribir más funciones de este tipo*) 
+let j x = [x];; 
+(*Se pueden escribir más funciones de este tipo ya que en la lista puede aparecer una unica vez el valor, como en mi caso, o tantas veces como quieras. Un ejemplo de comprobación sería asi: let l = function n -> function x -> List.init n (function _ -> x);;*)
+
+PRACTICA 9.
+1.
+let to0from n = let rec aux acc i =
+    if i>n then acc
+    else aux (i::acc) (i+1) in
+  aux [] 0;;
+
+let fromto m n = let rec aux acc i =
+    if m>n then []
+    else if i=m then i::acc
+    else aux (i::acc) (i-1) in
+  aux [] n;;
+
+let from1to n = let rec aux acc i =
+                   if n<1 then []
+                   else if i=1 then i::acc
+                   else aux (i::acc) (i-1) in
+  aux [] n;;
+
+let map f lst = let rec aux acc = function
+      [] -> acc
+    |h::t -> aux ((f h)::acc) t in
+  aux [] (List.rev lst);;
+
+let power x y = let rec aux acc i =
+                  if i=y then x*acc
+                  else aux (x*acc) (i+1) in
+  if y<0 then raise (Invalid_argument "power")
+  else if y=0 then 1
+  else aux 1 1;;
+
+let incseg lst = let rec aux accl accn = function
+      [] -> accl
+    |h::t -> aux ((h+accn)::accl) (h+accn) t in
+  List.rev (aux [] 0 lst);;
+
+let remove x lst = let rec aux lno = function
+      [] -> lno
+    |h::t -> if (x=h) then List.rev_append lno t
+      else aux (h::lno) t in
+  aux [] lst;;
+
+let rec divide = function lst ->
+  let rec impares a = function 
+  [] -> List.rev(a)
+  |h1::[] -> List.rev(h1::a)
+  | h1::h2::t -> impares (h1::a) t in
+  let rec pares = function [] -> [] | h1::l -> impares [] l
+  in (impares [] lst, pares lst);; 
+
+let rec compress = function l -> 
+    let rec aux a = function 
+    [] -> List.rev(a)
+    | h1::[] -> List.rev(h1::a)
+    | h1::h2::t -> if h1 = h2 then aux a (h2::t)
+    else aux (h1::a) (h2::t) in aux [] l;;
+    
+2.
+if Array.length Sys.argv = 2
+then 
+let rec fact = function 
+0->1 
+| n -> n * fact (n-1)
+in try print_endline (string_of_int (fact (int_of_string Sys.argv.(1)))) with 
+Failure(_)->print_endline "fact: argumento inválido"
+| Stack_overflow->print_endline "fact: argumento inválido"
+else print_endline "fact: número de argumentos inválido" 
+
+PRACTICA 10.
+SIMPLEMENTE ERA DE MEDIR TIEMPOS.
+
+PRACTICA 11.
+1.
+let in_board n m (x,y)=
+    x >= 1 && x <= m && y >= 1 && y <= n;;
+
+
+let not_mem l e =
+    not (List.mem e l);;
+
+
+let legal_moves (x,y) m n visited =
+    let moves = [(x-2, y+1);(x-1, y+2);(x+1, y+2);(x+2, y+1);
+                 (x+2, y-1);(x+1, y-2);(x-1, y-2);(x-2, y-1)] in
+                    List.filter (not_mem visited) (List.filter (in_board m n) moves);;
+
+
+let tour m n start finish =
+  let rec aux solution (x,y) moves = if finish = (x,y) then solution else match moves with
+    |[] -> raise Not_found
+    |start::t -> try aux (start::solution) start (legal_moves start m n solution)
+    with
+    Not_found -> aux solution (x,y) t
+    in List.rev(aux [start] start (legal_moves start  m n [start]));;
+2.
+let esValido fil col (x,y)=
+  x >= 1 && x <= fil && y >= 1 && y <= col;; 
+
+let not_mem l e =
+  not(List.mem e l);; 
+
+let rec compare_lengths list1 list2 = match (list1,list2) with
+	[],[] -> 0
+	| _,[] -> 1
+	| [], _ -> -1		
+	| _::t1, _::t2 -> compare_lengths t1 t2;;  
+                                                                                  
+let next (i,j) =
+    List.map (fun (x,y)->(i+x,j+y)) [(1,2);(1,-2);(-1,2);(-1,-2);(2,1);(2,-1);(-2,1);(-2,-1)];;
+
+let rec esFinal c =function
+    []->(-1,-1)
+    |h::t->if h = c then h else esFinal c t;;
+
+let tourAll m n inicio fin =
+    let rec aux camino (i,j) = 
+        if (i>m)||(i<1) ||(j>n) ||(j<1) then []
+        else
+            if (i,j) = fin && not_mem camino (i,j) then [List.rev ((i,j)::camino)]
+            else
+            if not_mem camino (i,j) then
+                let jump = next (i,j) in
+                    match esFinal fin jump with
+                        (-1,-1)-> let rec aux2 saltos= match(List.tl saltos) with
+                                    []->aux((i,j)::camino) (List.hd saltos)
+                                    |_->aux((i,j)::camino) (List.hd saltos) @ aux2(List.tl saltos)
+                                in aux2 jump
+                        | sol -> aux ((i,j)::camino) sol
+
+          else []
+        in aux [] inicio;;
+
+let escogerMenor lista = match lista with
+    []->raise(Invalid_argument"No hay lista")
+    |h::[]->h
+    |h::t-> let rec aux lista a = match (lista) with
+        []->a
+        |h::t-> match compare_lengths h a with
+                1|0->aux t a
+                |_->aux t h
+        in aux t h;;                                 
+
+let shortest_tour m n inicio fin = escogerMenor(tourAll m n inicio fin);;
+
+PRACTICA 12.
+opcional
+
+PRACTICA 13.
+type log_exp =
+    Const of bool
+  | Var of string
+  | Neg of log_exp
+  | Disj of log_exp * log_exp
+  | Conj of log_exp * log_exp
+  | Cond of log_exp * log_exp
+  | BiCond of log_exp * log_exp;;
+ 
+let rec eval ctx = function
+    Const b -> b
+  | Var s -> List.assoc s ctx
+  | Neg e -> not (eval ctx e)
+  | Disj (e1, e2) -> (eval ctx e1) || (eval ctx e2)
+  | Conj (e1, e2) -> (eval ctx e1) && (eval ctx e2)
+  | Cond (e1, e2) -> (not (eval ctx e1)) || (eval ctx e2)
+  | BiCond (e1, e2) -> (eval ctx e1) = (eval ctx e2);;
+    
+type oper = Not;;
+
+type biOper = Or | And | If | Iff;;
+
+type prop =
+    C of bool
+  | V of string
+  | Op of oper * prop
+  | BiOp of biOper * prop * prop;;
+  
+let expresion2 = BiOp (Iff, BiOp (If, V "p", V "q"), BiOp (Or, Op (Not, V "p"), V "q"));;
+  
+let rec prop_of_log_exp= function
+  Const b -> C b
+  |Var s -> V s
+  |Neg e -> Op (Not ,prop_of_log_exp e)
+  |Disj (e1,e2) -> BiOp (Or ,prop_of_log_exp e1 ,prop_of_log_exp e2 ) 
+  |Conj (e1,e2) -> BiOp (And ,prop_of_log_exp e1 ,prop_of_log_exp e2 )
+  |Cond (e1,e2) -> BiOp (If ,prop_of_log_exp e1 ,prop_of_log_exp e2 )
+  |BiCond (e1,e2) -> BiOp (Iff ,prop_of_log_exp e1 ,prop_of_log_exp e2 );;
+  
+let rec log_exp_of_prop = function
+    C b -> Const b
+  | V s -> Var s
+  | Op (Not ,p) -> Neg (log_exp_of_prop p)
+  | BiOp (Or ,p1,p2 ) -> Disj (log_exp_of_prop p1 , log_exp_of_prop p2)
+  | BiOp (And ,p1,p2 ) -> Conj (log_exp_of_prop p1 , log_exp_of_prop p2)
+  | BiOp (If ,p1,p2 ) -> Cond (log_exp_of_prop p1 , log_exp_of_prop p2)
+  | BiOp (Iff ,p1,p2 ) -> BiCond (log_exp_of_prop p1 , log_exp_of_prop p2);;
+  
+let opval = function
+  Not -> not;;
+
+let biopval = function
+    Or -> (||)
+  | And -> (&&)
+  | If -> (fun x y -> if x then y else true)
+  | Iff -> (=);;
+    
+let rec peval ctx = function
+    C b -> b
+  | V s -> List.assoc s ctx 
+  | Op (op ,p) -> opval op (peval ctx p)
+  | BiOp (op ,p1,p2 ) -> biopval op (peval ctx p1 ) (peval ctx p2);;
+
+let rec variables = function
+    C b -> []
+  | V s -> [s]
+  | Op (op ,p) -> variables p
+  | BiOp (op ,p1,p2 ) -> let ev1 = variables p1 and ev2 = variables p2
+  in List.filter (function x -> not(List.mem x ev2)) ev1 @ ev2 ;;
+
+let rec contexto ctx p = function
+  [] -> peval ctx p 
+  |h::t -> contexto ((h,true)::ctx) p t && contexto ((h,false)::ctx) p t 
+
+let rec is_tau p = let va = variables p in contexto [] p va;; 
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
